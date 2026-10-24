@@ -11,6 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="analyser.css" />
+    <link rel="stylesheet" href="market-snapshot.css" />
   </head>
   <body class="analyser-page">
     <div class="site-shell">
@@ -28,6 +29,15 @@
             <div class="model-note"><span class="note-mark">i</span><p><strong>Estimates, not predictions.</strong><br />This planner uses only the values and assumptions you enter. It does not fetch live quotes or recommend investments.</p></div>
           </div>
           <div class="date-line"><span>MODEL DATE</span><strong id="model-date">—</strong><span class="date-divider"></span><span>INR · NOMINAL VALUES</span></div>
+        </section>
+
+        <section class="market-snapshot" aria-labelledby="market-snapshot-title">
+          <div class="snapshot-heading"><div><p class="eyebrow">REFERENCE PRICES <span class="eyebrow-line"></span> MOST RECENT SESSION</p><h2 id="market-snapshot-title">Market snapshot</h2></div><span class="snapshot-date">FRIDAY · 23 OCTOBER 2026 CLOSE</span></div>
+          <div class="snapshot-grid">
+            <article class="snapshot-card"><div class="snapshot-card-top"><span class="snapshot-symbol">N50</span><span class="snapshot-kind">INDEX LEVEL</span></div><h3>NIFTY 50</h3><strong>22,600.00 <small>pts</small></strong><a href="https://markets.ft.markitdigital.com/data/indices/tearsheet/historical?s=NIFTY%3ANSI" target="_blank" rel="noreferrer">View closing data ↗</a></article>
+            <article class="snapshot-card snapshot-fund"><div class="snapshot-card-top"><span class="snapshot-symbol">MF</span><span class="snapshot-kind">DIRECT · GROWTH</span></div><h3>HDFC Nifty 50 Index Fund</h3><strong>₹221.2213 <small>/ unit</small></strong><a href="https://www.hdfcfund.com/nav-and-idcw" target="_blank" rel="noreferrer">View official NAV ↗</a></article>
+          </div>
+          <p class="snapshot-note">The index level is quoted in points; the fund figure is NAV per unit. These references are separate from your holdings and can become stale after the next market session.</p>
         </section>
 
         <section class="summary-grid" aria-label="Portfolio summary">
