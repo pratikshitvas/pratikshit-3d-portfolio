@@ -31,6 +31,36 @@
           <div class="date-line"><span>MODEL DATE</span><strong id="model-date">—</strong><span class="date-divider"></span><span>INR · NOMINAL VALUES</span></div>
         </section>
 
+        <section class="demat-panel" aria-labelledby="demat-title">
+          <div class="demat-copy">
+            <p class="eyebrow">ACCOUNT IMPORT <span class="eyebrow-line"></span> PRIVATE BY DESIGN</p>
+            <h2 id="demat-title">Start with your holdings.</h2>
+            <p>Do you already have a Demat account? We’ll use an exported holdings CSV or your manual entries. Never enter your broker password, PIN, OTP, or account login here.</p>
+          </div>
+          <div class="demat-choices" role="group" aria-label="Do you have a Demat account?">
+            <button id="demat-has-account" class="button button-primary" type="button">Yes, I have one</button>
+            <button id="demat-no-account" class="demat-secondary" type="button">No, help me get started</button>
+          </div>
+          <div id="demat-yes-panel" class="demat-followup" hidden>
+            <label for="holdings-csv">Import an exported holdings CSV</label>
+            <p>Choose a CSV saved from your broker or depository statement. It is read in this browser only and is not uploaded.</p>
+            <div class="csv-import-row"><input id="holdings-csv" type="file" accept=".csv,text/csv" /><label class="merge-control"><input id="merge-import" type="checkbox" /> Add to current list</label></div>
+            <p class="credential-warning"><strong>Security:</strong> This page never connects to a broker account and will never ask for your credentials or OTP.</p>
+          </div>
+          <div id="demat-no-panel" class="demat-followup" hidden>
+            <p>Open an account directly with a SEBI-registered depository participant or broker. The provider handles KYC and account setup; this analyser cannot open accounts or submit personal documents for you.</p>
+            <div class="demat-links"><a href="https://www.cdslindia.com/investors/open-demat.html" target="_blank" rel="noreferrer">CDSL: find a Depository Participant ↗</a><a href="https://investor.sebi.gov.in/securities-trading.html" target="_blank" rel="noreferrer">SEBI: getting started ↗</a></div>
+          </div>
+          <p id="import-status" class="import-status" role="status" aria-live="polite"></p>
+        </section>
+
+        <section id="portfolio-review" class="portfolio-review" aria-live="polite" hidden>
+          <div class="panel-heading"><div><p class="eyebrow">PORTFOLIO REVIEW <span class="eyebrow-line"></span> IMPORTED VALUES</p><h2>What stands out.</h2></div></div>
+          <div id="review-metrics" class="review-metrics"></div>
+          <ul id="review-notes" class="review-notes"></ul>
+          <p class="review-limit">This is a concentration and value check from your file—not a buy/sell recommendation. Trend and live market data are not connected, so no stock is presented as a current buy. Verify holdings and prices with your broker before acting.</p>
+        </section>
+
         <section class="market-snapshot" aria-labelledby="market-snapshot-title">
           <div class="snapshot-heading"><div><p class="eyebrow">REFERENCE PRICES <span class="eyebrow-line"></span> MOST RECENT SESSION</p><h2 id="market-snapshot-title">Market snapshot</h2></div><span class="snapshot-date">FRIDAY · 23 OCTOBER 2026 CLOSE</span></div>
           <div class="snapshot-grid">
