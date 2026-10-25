@@ -13,6 +13,85 @@
       return Array.isArray(saved) ? saved.filter(item => item && typeof item === 'object') : [];
     } catch { return []; }
   }
+  function parseCsv(text) {
+    const parsed = [];
+    let row = [], cell = '', quoted = false;
+    for (let index = 0; index < text.length; index += 1) {
+      const char = text[index];
+      if (char === '"') {
+        if (quoted && text[index + 1] === '"') { cell += '"'; index += 1; }
+        else quoted = !quoted;
+      } else if (char === ',' && !quoted) { row.push(cell.trim()); cell = ''; }
+      else if ((char === '\n' || char === '\r') && !quoted) {
+        if (char === '\r' && text[index + 1] === '\n') index += 1;
+        row.push(cell.trim());
+        if (row.some(value => value !== '')) parsed.push(row);
+        row = []; cell = '';
+      } else cell += char;
+    }
+    row.push(cell.trim());
+    if (row.some(value => value !== '')) parsed.push(row);
+    return parsed;
+  }
+  function numberFromCsv(value) {
+    const cleaned = String(value || '').replace(/[₹,$\s]/g, '').replace(/\(([^)]+)\)/, '-$1').replace(/,/g, '');
+    const number = Number(cleaned);
+    return Number.isFinite(number) && number > 0 ? number : 0;
+  }
+  function importCsv(text) {
+    const records = parseCsv(text);
+    if (records.length < 2) throw new Error('The CSV does not contain any holdings rows.');
+    const headers = records[0].map(value => value.toLowerCase().replace(/[^a-z0-9]/g, ''));
+    const findColumn = patterns => headers.findIndex(header => patterns.some(pattern => pattern.test(header)));
+    const nameColumn = findColumn([/securityname/, /companyname/, /instrumentname/, /scripname/, /symbol/, /assetname/, /^name$/]);
+    const isinColumn = findColumn([/^isin$/]);
+    const quantityColumn = findColumn([/^qty$/, /quantity/, /^units$/]);
+    const priceColumn = findColumn([/^ltp$/, /lasttradedprice/, /currentprice/, /marketprice/]);
+    const valueColumn = findColumn([/totalmarketvalue/, /marketvalue/, /currentvalue/, /valuation/, /^valueinr$/]);
+    const investedColumn = findColumn([/investedamount/, /investedvalue/, /costvalue/, /purchasevalue/, /totalcost/]);
+    const averageColumn = findColumn([/averageprice/, /avgprice/, /buyprice/, /averagecost/, /costprice/]);
+    const typeColumn = findColumn([/^assettype$/, /^securitytype$/, /^type$/]);
+    if (nameColumn < 0 && isinColumn < 0) throw new Error('Could not find a name, symbol, or ISIN column.');
+    if (valueColumn < 0 && (quantityColumn < 0 || priceColumn < 0)) throw new Error('Could not find a current/market value column or both quantity and price columns.');
+    const imported = records.slice(1).map((cells, index) => {
+      const get = column => column < 0 ? '' : cells[column] || '';
+      const name = get(nameColumn) || get(isinColumn);
+      const quantity = numberFromCsv(get(quantityColumn));
+      const value = valueColumn >= 0 ? numberFromCsv(get(valueColumn)) : quantity * numberFromCsv(get(priceColumn));
+      const invested = investedColumn >= 0 ? numberFromCsv(get(investedColumn)) : quantity * numberFromCsv(get(averageColumn));
+      const sourceType = get(typeColumn).toLowerCase();
+      const kind = /mutual|fund|etf/.test(`${sourceType} ${name}`.toLowerCase()) ? 'Mutual fund' : 'Stock';
+      return { id: `import-${Date.now()}-${index}`, name: name.trim(), kind, invested, value, rate: 0, risk: 'medium' };
+    }).filter(item => item.name && (item.value > 0 || item.invested > 0));
+    if (!imported.length) throw new Error('No usable holdings were found. Check that the CSV has names plus current values.');
+    return imported;
+  }
+  function reviewImportedHoldings(imported) {
+    const review = document.querySelector('#portfolio-review');
+    const metrics = document.querySelector('#review-metrics');
+    const notes = document.querySelector('#review-notes');
+    const total = imported.reduce((sum, item) => sum + safeNumber(item.value), 0);
+    const invested = imported.reduce((sum, item) => sum + safeNumber(item.invested), 0);
+    const sorted = [...imported].sort((a, b) => safeNumber(b.value) - safeNumber(a.value));
+    const top = sorted[0];
+    const topShare = total && top ? safeNumber(top.value) / total * 100 : 0;
+    const returnPct = invested ? (total / invested - 1) * 100 : null;
+    metrics.innerHTML = `
+      <article class="review-metric"><span>POSITIONS READ</span><strong>${imported.length}</strong></article>
+      <article class="review-metric"><span>IMPORTED CURRENT VALUE</span><strong>${money.format(total)}</strong></article>
+      <article class="review-metric"><span>TOP POSITION WEIGHT</span><strong>${topShare.toFixed(1)}%</strong><small>${escapeText(top?.name || 'No value')}</small></article>
+      ${returnPct === null ? '' : `<article class="review-metric"><span>VALUE VS COST VALUE</span><strong>${returnPct >= 0 ? '+' : '−'}${Math.abs(returnPct).toFixed(1)}%</strong><small>From imported figures; no date range supplied</small></article>`}`;
+    const observations = [];
+    if (top && topShare >= 30) observations.push(`${top.name} is ${topShare.toFixed(1)}% of the value in this file. Review issuer concentration and whether that matches your risk tolerance.`);
+    if (imported.length < 5) observations.push(`The file contains ${imported.length} position${imported.length === 1 ? '' : 's'}. Check whether your exposure is diversified across issuers and asset types.`);
+    if (!imported.some(item => item.kind === 'Mutual fund')) observations.push('No mutual fund or ETF was identified in this import. If you hold one, verify that it was included in the exported file.');
+    if (returnPct !== null) observations.push('Value versus cost is a snapshot from the file, not a time-series trend or a forecast.');
+    else observations.push('The file did not include cost values, so gain/loss could not be calculated.');
+    observations.push('A live price history feed is not connected. No trend-based stock shortlist or buy/sell call is generated from stale or incomplete data.');
+    notes.innerHTML = observations.map(note => `<li>${escapeText(note)}</li>`).join('');
+    review.hidden = false;
+    review.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
   function save() {
     try { localStorage.setItem(storageKey, JSON.stringify(holdings)); } catch { /* The planner still works when storage is unavailable. */ }
   }
@@ -116,6 +195,30 @@
   document.querySelector('#add-holding').addEventListener('click', () => addHolding());
   document.querySelector('#empty-add').addEventListener('click', () => addHolding());
   document.querySelector('#clear-holdings').addEventListener('click', () => { holdings = []; save(); render(); });
+  document.querySelector('#demat-has-account').addEventListener('click', () => {
+    document.querySelector('#demat-yes-panel').hidden = false;
+    document.querySelector('#demat-no-panel').hidden = true;
+    document.querySelector('#import-status').textContent = '';
+    document.querySelector('#holdings-csv').focus();
+  });
+  document.querySelector('#demat-no-account').addEventListener('click', () => {
+    document.querySelector('#demat-no-panel').hidden = false;
+    document.querySelector('#demat-yes-panel').hidden = true;
+    document.querySelector('#import-status').textContent = '';
+  });
+  document.querySelector('#holdings-csv').addEventListener('change', async event => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const status = document.querySelector('#import-status');
+    try {
+      const imported = importCsv(await file.text());
+      holdings = document.querySelector('#merge-import').checked ? [...holdings, ...imported] : imported;
+      save(); render(); reviewImportedHoldings(imported);
+      status.textContent = `${imported.length} positions imported in this browser. Review names and values below.`;
+    } catch (error) {
+      status.textContent = error.message || 'Could not read this CSV. Try a broker holdings export or enter positions manually.';
+    } finally { event.target.value = ''; }
+  });
   horizon.addEventListener('change', update);
   document.querySelector('#copy-portfolio').addEventListener('click', async () => {
     const feedback = document.querySelector('#copy-feedback');
