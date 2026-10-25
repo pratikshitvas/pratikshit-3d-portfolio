@@ -20,4 +20,38 @@
 .analyser-page .snapshot-symbol,.analyser-page .snapshot-fund .snapshot-symbol{border-color:rgba(255,79,147,.45);color:#ff8ab5}
 .analyser-page .snapshot-fund>strong{color:#fff}
 .analyser-page .snapshot-card>a{border-color:rgba(255,240,246,.3)}
-
+.analyser-page .demat-panel,.analyser-page .portfolio-review{margin:0 0 34px;border:1px solid var(--line);background:linear-gradient(125deg,rgba(255,79,147,.12),transparent 62%),rgba(39,11,24,.88);padding:26px 28px}
+.analyser-page .demat-copy{max-width:780px}
+.analyser-page .demat-copy .eyebrow{margin:0 0 10px}
+.analyser-page .demat-copy h2,.analyser-page .portfolio-review h2{font:600 23px var(--display);letter-spacing:-.045em;margin:0}
+.analyser-page .demat-copy>p:last-child,.analyser-page .demat-followup>p{font-size:11px;line-height:1.8;color:var(--muted);max-width:760px;margin:9px 0 0}
+.analyser-page .demat-choices{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.analyser-page .demat-choices .button{cursor:pointer}
+.analyser-page .demat-secondary{border:1px solid rgba(255,240,246,.32);background:transparent;color:var(--ink);border-radius:3px;padding:12px 16px;font:600 11px var(--sans);cursor:pointer;transition:border-color .2s,background .2s}
+.analyser-page .demat-secondary:hover{border-color:var(--violet);background:rgba(255,79,147,.1)}
+.analyser-page .demat-followup{margin-top:20px;padding:18px;border:1px solid rgba(255,240,246,.16);background:rgba(18,5,11,.55)}
+.analyser-page .demat-followup[hidden],.analyser-page .portfolio-review[hidden]{display:none!important}
+.analyser-page .demat-followup>label{font:600 12px var(--display);color:var(--ink)}
+.analyser-page .demat-followup>p{margin-top:5px}
+.analyser-page .csv-import-row{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:13px}
+.analyser-page #holdings-csv{max-width:100%;font:10px var(--sans);color:var(--muted)}
+.analyser-page #holdings-csv::file-selector-button{border:1px solid rgba(255,79,147,.55);background:#3a1024;color:#fff7fa;padding:9px 12px;margin-right:10px;font:600 10px var(--sans);cursor:pointer}
+.analyser-page .merge-control{display:flex;align-items:center;gap:7px;font:10px var(--sans);color:var(--muted)}
+.analyser-page .merge-control input{accent-color:#ff4f93}
+.analyser-page .credential-warning{border-left:2px solid #ff4f93;padding-left:11px;margin-top:15px!important;color:#ffe5ee!important}
+.analyser-page .demat-links{display:flex;gap:17px;flex-wrap:wrap;margin-top:14px}
+.analyser-page .demat-links a{color:#ff9dc0;font-size:10px;text-decoration:none;border-bottom:1px solid rgba(255,157,192,.4);padding-bottom:2px}
+.analyser-page .demat-links a:hover{color:#fff}
+.analyser-page .import-status{min-height:0;color:#ffd9e5;font:10px var(--mono);margin:12px 0 0}
+.analyser-page .portfolio-review{padding-bottom:21px}
+.analyser-page .portfolio-review .panel-heading{margin-bottom:17px}
+.analyser-page .review-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.analyser-page .review-metric{min-width:0;padding:14px;border:1px solid rgba(255,240,246,.15);background:rgba(18,5,11,.5)}
+.analyser-page .review-metric>span{display:block;font:8px var(--mono);letter-spacing:.06em;color:var(--dim)}
+.analyser-page .review-metric>strong{display:block;margin-top:8px;font:600 clamp(18px,2vw,26px) var(--display);letter-spacing:-.04em;color:#fff;overflow-wrap:anywhere}
+.analyser-page .review-metric>small{display:block;margin-top:3px;font-size:9px;color:var(--muted);overflow-wrap:anywhere}
+.analyser-page .review-notes{display:grid;gap:8px;margin:16px 0 0;padding-left:18px;color:var(--muted);font-size:10px;line-height:1.75}
+.analyser-page .review-notes li::marker{color:#ff4f93}
+.analyser-page .review-limit{border-top:1px solid var(--line);margin:15px 0 0;padding-top:12px;color:var(--dim);font-size:9px;line-height:1.75}
+@media(max-width:760px){.analyser-page .review-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.analyser-page .demat-panel,.analyser-page .portfolio-review{padding:20px 16px}.analyser-page .demat-copy h2,.analyser-page .portfolio-review h2{font-size:20px}.analyser-page .demat-choices{align-items:stretch;flex-direction:column}.analyser-page .demat-choices>*{justify-content:center}.analyser-page .review-metrics{grid-template-columns:1fr 1fr}.analyser-page .review-metric{padding:11px}}
